@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use Exception;
-use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -14,8 +14,8 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
             'password' => 'required|confirmed',
         ]);
 
@@ -24,21 +24,19 @@ class AuthController extends Controller
         }
 
         $user = User::create([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password)
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
         $token = $user->createToken('authToken')->plainTextToken;
 
-
-
-        if($user) {
+        if ($user) {
             return response()->json([
                 'token_type' => 'Bearer',
                 'access_token' => $token,
                 'user' => $user,
-                'message' => "berhasil register"
+                'message' => 'berhasil register',
             ], 201);
         }
 
@@ -66,9 +64,8 @@ class AuthController extends Controller
                 return response()->json(['message' => 'Email User Salah'], 400);
             }
 
-
             // jika hash tidak sesuai muncul alert
-            if (!Hash::check($request->password, $user->password, [])) {
+            if (! Hash::check($request->password, $user->password, [])) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Password salah',
@@ -82,13 +79,13 @@ class AuthController extends Controller
                 'token_type' => 'Bearer',
                 'access_token' => $token,
                 'user' => $user,
-                'message' => "berhasil login"
+                'message' => 'berhasil login',
             ]);
         } catch (Exception $error) {
             return response()->json([
                 'status' => false,
                 'message' => $error->getMessage(),
-            ],  500);
+            ], 500);
         }
     }
 
@@ -96,9 +93,10 @@ class AuthController extends Controller
     {
         $user = $request->user();
         $user->tokens()->delete();
+
         return response()->json([
             'user' => $user,
-            'message' => "berhasil logout"
+            'message' => 'berhasil logout',
         ]);
     }
 }
